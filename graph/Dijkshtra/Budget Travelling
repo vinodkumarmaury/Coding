@@ -1,0 +1,91 @@
+#include<bits/stdc++.h>
+using namespace std;
+const int mod = 1e9+7;
+using ll = long long;
+#define endl '\n'
+using state = pair<int,int>;
+const int inf = 1e9;
+
+int n,m,st,en,k;
+vector<vector<state>> adj;
+vector<vector<int>> dist,vis;
+vector<int> petrolPriceAtEachNode;
+
+void dijkstra(){
+    priority_queue<pair<int,state>> pq; //dist,node,fuel;
+    pq.push({0,{st,0}});
+    dist[st][0] = 0; //node,fuel
+    
+    while(!pq.empty()){
+        auto x = pq.top();
+        pq.pop();
+        int curr_dist = -x.first;
+        state curr = x.second;
+         
+         if(vis[curr.first][curr.second])continue;
+         vis[curr.first][curr.second] = 1;
+
+        for(auto &v:adj[curr.first]){
+            int new_node = v.first;
+            int need = v.second;
+           
+           if(curr.second >= need){
+             if(dist[new_node][curr.second-need] > curr_dist){
+              dist[new_node][curr.second-need] = curr_dist;
+               pq.push({-dist[new_node][curr.second-need], {new_node, curr.second-need}});
+               }
+                }
+
+            
+          if(curr.second < k && dist[curr.first][curr.second+1] > curr_dist + petrolPriceAtEachNode[curr.first]){
+                dist[curr.first][curr.second+1] = curr_dist + petrolPriceAtEachNode[curr.first];
+                pq.push({-dist[curr.first][curr.second+1], {curr.first, curr.second+1}});
+                 }
+
+
+        }
+    }
+
+}
+
+void solve(){
+cin>>n;
+cin>>m;
+
+adj.resize(n+1);
+
+
+for(int i = 0;i<m;i++){
+    int a,b,d;
+    cin>>a>>b>>d;
+    adj[a].push_back({b,d});
+    adj[b].push_back({a,d});
+}
+
+petrolPriceAtEachNode.resize(n+1);
+for(int i=1;i<=n;i++) cin >> petrolPriceAtEachNode[i];
+
+
+cin>>st>>en>>k;
+dist.resize(n+1,vector<int>(k+1,inf));
+vis.resize(n+1,vector<int>(k+1,0));
+
+dijkstra();
+
+int ans = inf;
+for(int f=0; f<=k; f++) ans = min(ans, dist[en][f]);
+cout << ans << endl;
+
+
+}
+
+int main(){
+    ios_base::sync_with_stdio(0);
+    cin.tie(0);
+    cout.tie(0);
+    int t=1;
+    while(t--){
+        solve();
+    }
+    return 0;
+}
