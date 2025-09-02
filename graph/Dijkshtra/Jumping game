@@ -1,0 +1,84 @@
+#include<bits/stdc++.h>
+using namespace std;
+using ll = long long;
+const ll mod = 1e18;
+#define endl '\n'
+const ll inf = 1e18;
+using state = pair<ll,ll>;
+
+
+ll n;
+ll jumpingCost, neigbhouringCost;
+
+vector<vector<pair<ll,ll>>> adj;
+vector<ll> dist;
+
+void Dijkstra(ll src){
+  
+  priority_queue<state> pq;
+  pq.push({0,src});
+  dist[src] = 0;
+
+  while(!pq.empty()){
+    state curr = pq.top();
+    pq.pop();
+    ll d = -curr.first;
+    if(d>dist[curr.second])continue;
+    for(auto &v:adj[curr.second]){
+        ll node = v.first;
+        ll cost = v.second;
+        if(dist[node]>dist[curr.second]+cost){
+            dist[node] = dist[curr.second]+cost;
+            pq.push({-dist[node],node});
+        }
+    }
+  }
+}
+
+void solve(){
+cin>>n;
+cin>>jumpingCost>>neigbhouringCost;
+
+map<ll,vector<ll>> mp;
+
+for(ll i = 1;i<=n;i++){
+    ll x;
+    cin>>x;
+    mp[x].push_back(i);
+}
+ll src;
+cin>>src;
+adj.assign(n+mp.size()+2,{});
+dist.assign(n+2+mp.size(),inf);
+
+for(ll i = 1;i<n;i++){
+adj[i].push_back({i+1,neigbhouringCost});
+adj[i+1].push_back({i,neigbhouringCost});
+}
+ll Dnode = n+1;
+for(auto &v:mp){
+for(auto &u:v.second){
+    adj[Dnode].push_back({u,jumpingCost});
+    adj[u].push_back({Dnode,0});
+}
+Dnode++;
+}
+
+Dijkstra(src);
+
+for(ll i = 1;i<=n;i++){
+    cout<<dist[i]<<" ";
+}
+cout<<endl;
+}
+int main(){
+    ios_base::sync_with_stdio(0);
+    cin.tie(0);
+    cout.tie(0);
+    ll t=1;
+    // cin>>t;
+    while(t--){
+        solve();
+    }
+    return 0;
+}
