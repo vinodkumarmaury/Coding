@@ -23,7 +23,6 @@ void Dijkstra(ll src){
     state curr = pq.top();
     pq.pop();
     ll d = -curr.first;
-    if(d>dist[curr.second])continue;
     for(auto &v:adj[curr.second]){
         ll node = v.first;
         ll cost = v.second;
